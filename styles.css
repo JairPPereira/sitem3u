@@ -1,0 +1,33 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+}
+
+.container {
+    display: flex;
+}
+
+.groups, .channels {
+    width: 200px;
+    padding: 10px;
+    border-right: 1px solid #ddd;
+    background-color: #fff;
+    height: 600px;
+    overflow-y: auto;
+}
+
+.channels {
+    border-right: none;
+}
+
+video {
+    width: 600px;
+    height: 400px;
+    background-color: #000;
+}

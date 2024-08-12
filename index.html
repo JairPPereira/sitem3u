@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Multimídia com hls.js</title>
+    <style>
+        body {
+            display: flex;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #groups, #channels, #player {
+            padding: 10px;
+            overflow-y: auto;
+        }
+        #groups {
+            width: 20%;
+            background-color: #f4f4f4;
+        }
+        #channels {
+            width: 20%;
+            background-color: #e9e9e9;
+        }
+        #player {
+            width: 60%;
+            background-color: #d4d4d4;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            overflow-y: hidden;
+        }
+        button {
+            width: 100%;
+            margin-bottom: 5px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        div.channel {
+            cursor: pointer;
+            padding: 10px;
+            margin-bottom: 5px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        div.channel:hover {
+            background-color: #f0f0f0;
+        }
+        #video {
+            width: 100%;
+            max-width: 100%;
+            background-color: black;
+        }
+        #channelName {
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+        }
+        #openStreamBtn {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            width: 100%;
+        }
+        #openStreamBtn:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div id="groups"></div>
+    <div id="channels"></div>
+    <div id="player">
+        <video id="video" controls crossorigin playsinline>
+            <source id="videoSource" src="" />
+            Seu navegador não suporta o elemento <code>video</code>.
+        </video>
+        <div id="channelName"></div>
+        <button id="openStreamBtn" style="display: none;">Abrir em nova aba</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script>
+        const m3uUrl = 'https://raw.githubusercontent.com/JairPPereira/tvweb/main/jpiptv/playtv.m3u'; // Substitua pela URL da sua lista M3U
+
+        async function loadM3U() {
+            try {
+                const response = await fetch(m3uUrl);
+                const text = await response.text();
+                parseM3U(text);
+            } catch (error) {
+                console.error('Erro ao carregar a lista M3U:', error);
+            }
+        }
+
+        function parseM3U(data) {
+            const lines = data.split('\n');
+            const groups = {};
+            
+            lines.forEach((line, index) => {
+                if (line.startsWith('#EXTINF:')) {
+                    const parts = line.split(',');
+                    const name = parts[1].trim();
+                    const url = lines[index + 1].trim();
+                    
+                    const groupMatch = line.match(/group-title="([^"]*)"/);
+                    const group = groupMatch ? groupMatch[1] : 'Geral';
+                    
+                    if (!groups[group]) groups[group] = [];
+                    groups[group].push({ name, url });
+                }
+            });
+            
+            displayGroups(groups);
+        }
+
+        function displayGroups(groups) {
+            const groupsContainer = document.getElementById('groups');
+            groupsContainer.innerHTML = '';
+            const groupKeys = Object.keys(groups);
+            
+            if (groupKeys.length === 0) {
+                groupsContainer.innerHTML = 'Nenhum grupo encontrado.';
+            } else {
+                groupKeys.forEach(group => {
+                    const button = document.createElement('button');
+                    button.textContent = group;
+                    button.onclick = () => displayChannels(groups[group]);
+                    groupsContainer.appendChild(button);
+                });
+            }
+        }
+
+        function displayChannels(channels) {
+            const channelsContainer = document.getElementById('channels');
+            channelsContainer.innerHTML = '';
+            if (channels.length === 0) {
+                channelsContainer.innerHTML = 'Nenhum canal encontrado.';
+            } else {
+                channels.forEach(channel => {
+                    const item = document.createElement('div');
+                    item.textContent = channel.name;
+                    item.className = 'channel';
+                    item.onclick = () => playChannel(channel.name, channel.url);
+                    channelsContainer.appendChild(item);
+                });
+            }
+        }
+
+        function playChannel(name, url) {
+            const video = document.getElementById('video');
+            const videoSource = document.getElementById('videoSource');
+            const hls = Hls.isSupported() ? new Hls() : null;
+            const channelName = document.getElementById('channelName');
+            const openStreamBtn = document.getElementById('openStreamBtn');
+
+            // Atualizar o nome do canal
+            channelName.textContent = name;
+            openStreamBtn.style.display = 'block';
+            openStreamBtn.onclick = () => window.open(url, '_blank');
+
+            // Verificar o tipo de arquivo e configurar o player
+            if (url.endsWith('.m3u8')) {
+                if (hls) {
+                    hls.loadSource(url);
+                    hls.attachMedia(video);
+                    hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                        video.play();
+                    });
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = url;
+                    video.play();
+                } else {
+                    console.error('O formato HLS não é suportado.');
+                }
+            } else if (url.endsWith('.mp4') || url.endsWith('.mp3')) {
+                videoSource.type = url.endsWith('.mp4') ? 'video/mp4' : 'audio/mp3';
+                video.src = url;
+                video.play();
+            } else {
+                console.error('Formato de arquivo não suportado.');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadM3U();
+        });
+    </script>
+</body>
+</html>
