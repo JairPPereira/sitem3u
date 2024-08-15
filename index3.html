@@ -16,7 +16,7 @@
             height: 100vh;
             color: #333;
         }
-    
+
         .container {
             display: flex;
             width: 100%;
@@ -26,7 +26,7 @@
             border-radius: 8px;
             overflow: hidden;
         }
-    
+
         .column {
             flex: 1;
             padding: 20px;
@@ -34,11 +34,11 @@
             overflow-y: auto; /* Permite rolagem vertical */
             box-sizing: border-box;
         }
-    
+
         .column:last-child {
             border-right: none;
         }
-    
+
         .column h2 {
             text-align: center;
             margin: 0 0 20px 0;
@@ -48,13 +48,13 @@
             padding: 10px;
             border-bottom: 1px solid #ddd;
         }
-    
+
         ul {
             list-style-type: none;
             padding: 0;
             margin: 0;
         }
-    
+
         ul li {
             padding: 12px;
             cursor: pointer;
@@ -66,33 +66,32 @@
             transition: background-color 0.3s, transform 0.2s;
             font-size: 16px; /* Tamanho da fonte ajustado */
         }
-    
+
         ul li:hover {
             background-color: #007BFF;
             color: #fff;
             transform: scale(1.02);
         }
-    
+
         ul li:active {
             transform: scale(0.98);
         }
-    
+
         @media (max-width: 768px) {
             .container {
                 flex-direction: column;
             }
-    
+
             .column {
                 border-right: none;
                 border-bottom: 1px solid #ddd;
             }
-    
+
             .column:last-child {
                 border-bottom: none;
             }
         }
     </style>
-    
 </head>
 <body>
     <div class="container">
@@ -160,25 +159,5 @@
             });
         }
     </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var videoElements = document.getElementsByTagName('video');
-            for (var i = 0; i < videoElements.length; i++) {
-                videoElements[i].addEventListener('play', function() {
-                    var elem = this;
-                    if (elem.requestFullscreen) {
-                        elem.requestFullscreen();
-                    } else if (elem.mozRequestFullScreen) { // Firefox
-                        elem.mozRequestFullScreen();
-                    } else if (elem.webkitRequestFullscreen) { // Chrome, Safari, Opera
-                        elem.webkitRequestFullscreen();
-                    } else if (elem.msRequestFullscreen) { // IE/Edge
-                        elem.msRequestFullscreen();
-                    }
-                }, false);
-            }
-        });
-    </script>
-    
 </body>
 </html>
