@@ -20,7 +20,7 @@
         .container {
             display: flex;
             width: 100%;
-            height: 100vh; /* Ocupa 100% da altura da viewport */
+            height: 100vh;
             background-color: #fff;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
@@ -31,7 +31,7 @@
             flex: 1;
             padding: 20px;
             border-right: 1px solid #ddd;
-            overflow-y: auto; /* Permite rolagem vertical */
+            overflow-y: auto;
             box-sizing: border-box;
         }
 
@@ -56,15 +56,24 @@
         }
 
         ul li {
+            display: flex;
+            align-items: center;
             padding: 12px;
             cursor: pointer;
             border: 1px solid #ddd;
             margin-bottom: 8px;
-            text-align: center;
+            text-align: left;
             border-radius: 4px;
             background-color: #f9f9f9;
             transition: background-color 0.3s, transform 0.2s;
-            font-size: 16px; /* Tamanho da fonte ajustado */
+            font-size: 16px;
+        }
+
+        ul li img {
+            margin-right: 10px;
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
         }
 
         ul li:hover {
@@ -127,15 +136,21 @@
 
             lines.forEach(line => {
                 if (line.startsWith('#EXTINF')) {
-                    const groupTitle = line.match(/group-title="([^"]+)"/)[1];
+                    const groupTitleMatch = line.match(/group-title="([^"]+)"/);
                     const channelName = line.split(',')[1];
+                    const logoUrlMatch = line.match(/tvg-logo="([^"]+)"/);
                     const streamUrl = lines[lines.indexOf(line) + 1].trim();
 
-                    if (!groups[groupTitle]) {
-                        groups[groupTitle] = [];
-                    }
+                    if (groupTitleMatch && channelName && streamUrl) {
+                        const groupTitle = groupTitleMatch[1];
+                        const logoUrl = logoUrlMatch ? logoUrlMatch[1] : '';
 
-                    groups[groupTitle].push({ name: channelName, url: streamUrl });
+                        if (!groups[groupTitle]) {
+                            groups[groupTitle] = [];
+                        }
+
+                        groups[groupTitle].push({ name: channelName, url: streamUrl, logo: logoUrl });
+                    }
                 }
             });
         }
@@ -153,7 +168,11 @@
             channelList.innerHTML = ''; // Limpar a lista de canais
             groups[group].forEach(channel => {
                 const li = document.createElement('li');
-                li.textContent = channel.name;
+                const img = document.createElement('img');
+                img.src = channel.logo;
+                img.alt = channel.name;
+                li.appendChild(img);
+                li.appendChild(document.createTextNode(channel.name));
                 li.onclick = () => window.open(channel.url, '_blank');
                 channelList.appendChild(li);
             });
