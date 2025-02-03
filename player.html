@@ -1,27 +1,44 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reprodutor de Vídeo</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.5.2/video-js.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.5.2/video.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css">
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: black;
+            margin: 0;
+        }
+        .player-container {
+            width: 90%;
+            max-width: 800px;
+        }
+    </style>
 </head>
 <body>
 
-    <video id="video-player" class="video-js vjs-default-skin" controls width="800" height="450">
-        <source id="video-source" src="" type="application/x-mpegURL">
-    </video>
+    <div class="player-container">
+        <video id="video-player" controls crossorigin playsinline>
+            <source id="video-source" src="" type="application/x-mpegURL">
+        </video>
+    </div>
 
     <script>
-        // Obter o URL do stream a partir dos parâmetros da URL
+        // Obter a URL do stream a partir dos parâmetros da URL
         const urlParams = new URLSearchParams(window.location.search);
         const streamUrl = urlParams.get('url');
 
         if (streamUrl) {
             document.getElementById('video-source').src = streamUrl;
-            const player = videojs('video-player');
-            player.load();
+            const player = new Plyr('#video-player', {
+                fullscreen: { enabled: true, fallback: true, iosNative: true }
+            });
         } else {
             alert("Erro: Nenhuma URL de vídeo encontrada!");
         }
