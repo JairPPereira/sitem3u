@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leitor de M3U</title>
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css">
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -169,30 +172,22 @@
     groups[group].forEach(channel => {
         const li = document.createElement('li');
         const img = document.createElement('img');
-        
+
         img.src = channel.logo;
         img.alt = channel.name;
-        
+
         li.appendChild(img);
         li.appendChild(document.createTextNode(channel.name));
-        
+
         li.onclick = () => {
-            // Copiar o link para a área de transferência
-            navigator.clipboard.writeText(channel.url)
-                .then(() => {
-                    console.log("Link copiado para a área de transferência!");
-                })
-                .catch(err => {
-                    console.error("Erro ao copiar o link: ", err);
-                });
-            
-            // Abrir o link em outra aba
-            window.open(channel.url, '_blank');
+            // Abrir o player.html e passar a URL do stream como parâmetro
+            window.open(`player.html?url=${encodeURIComponent(channel.url)}`, '_blank');
         };
-        
+
         channelList.appendChild(li);
     });
 }
+
 
     </script>
 </body>
