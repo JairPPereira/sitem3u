@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reprodutor de Vídeo</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.5.2/video-js.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.5.2/video.min.js"></script>
+</head>
+<body>
+
+    <video id="video-player" class="video-js vjs-default-skin" controls width="800" height="450">
+        <source id="video-source" src="" type="application/x-mpegURL">
+    </video>
+
+    <script>
+        // Obter o URL do stream a partir dos parâmetros da URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const streamUrl = urlParams.get('url');
+
+        if (streamUrl) {
+            document.getElementById('video-source').src = streamUrl;
+            const player = videojs('video-player');
+            player.load();
+        } else {
+            alert("Erro: Nenhuma URL de vídeo encontrada!");
+        }
+    </script>
+
+</body>
+</html>
